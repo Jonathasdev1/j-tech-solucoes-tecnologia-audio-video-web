@@ -95,6 +95,10 @@ function ensure_analytics_schema(mysqli $conexao): void
         $conexao->query('ALTER TABLE logs_visitas_site CHANGE views_count total_visualizacoes INT NOT NULL DEFAULT 1');
     }
 
+    if (!jtech_table_exists($conexao, 'visitante')) {
+        return;
+    }
+
     // Migra colunas antigas (inglês -> pt-BR) na tabela de usuarios.
     if (jtech_column_exists($conexao, 'visitante', 'created_at') && !jtech_column_exists($conexao, 'visitante', 'criado_em')) {
         $conexao->query('ALTER TABLE visitante CHANGE created_at criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP');
@@ -158,6 +162,10 @@ function register_site_visit(mysqli $conexao, string $page, bool $isAuthenticate
 
 function register_user_login_metrics(mysqli $conexao, int $userId): void
 {
+    if (!jtech_table_exists($conexao, 'visitante')) {
+        return;
+    }
+
     $stmt = $conexao->prepare('UPDATE visitante SET qtd_logins = COALESCE(qtd_logins, 0) + 1, ultimo_login_em = NOW() WHERE idvisitante = ?');
     if ($stmt) {
         $stmt->bind_param('i', $userId);
@@ -178,6 +186,10 @@ function get_admin_dashboard_metrics(mysqli $conexao): array
         'visitors_only' => 0,
         'registered_total' => 0,
     ];
+
+    if (!jtech_table_exists($conexao, 'visitante')) {
+        return $metrics;
+    }
 
     $result = $conexao->query('SELECT COUNT(*) AS total FROM visitante');
     if ($result) {
