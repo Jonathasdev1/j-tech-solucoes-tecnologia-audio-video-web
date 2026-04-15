@@ -1,0 +1,15 @@
+.vscode/
+exports/
+
+# Cookies/sessao local
+admin_cookie.txt
+cookie_admin.txt
+cookie_user.txt
+sess_cookie.txt
+
+# Ambiente local
+.env
+.env.*
+
+# Logs
+*.log

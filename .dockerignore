@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+node_modules
+exports
+*.log
+admin_cookie.txt
+cookie_admin.txt
+cookie_user.txt
+sess_cookie.txt

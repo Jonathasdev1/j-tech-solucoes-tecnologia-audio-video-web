@@ -1,0 +1,14 @@
+<?php 
+// Dados de acesso ao MySQL no XAMPP.
+$servername = "localhost"; 
+$username = "root"; 
+$password = "usbw"; 
+// Nome do banco mostrado no phpMyAdmin.
+$dbname = "visitante-j-tech"; 
+
+// Cria a conexao com o banco de dados.
+$conexao = new mysqli($servername, $username, $password, $dbname); 
+if ($conexao->connect_error) { 
+	die("Connection failed: " . $conexao->connect_error); 
+} 
+?>

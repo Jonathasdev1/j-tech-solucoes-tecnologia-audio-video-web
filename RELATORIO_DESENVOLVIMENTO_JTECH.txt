@@ -1,0 +1,166 @@
+RELATORIO DE DESENVOLVIMENTO - PROJETO J-TECH LOGIN
+
+Autor: Jonathas Teixeira Netto
+Data: 10/04/2026
+
+1) Introducao
+Neste projeto, a ideia principal foi construir um sistema web em PHP com login, cadastro, validacoes e 
+pagina administrativa para listar usuarios cadastrados. O foco foi organizar o codigo, reduzir erros e 
+facilitar manutencao futura.
+
+2) Primeiros passos e organizacao inicial
+No inicio, foi feita uma verificacao geral da pasta do projeto para descobrir:
+- Arquivos existentes
+- Arquivos vazios
+- Dependencias quebradas
+- Fluxos principais (login, principal, cadastro)
+
+Foi identificado que o sistema chamava "conection.php", mas esse arquivo nao existia (existia "conection.bd").
+A primeira correcao importante foi criar o arquivo "conection.php" com os dados de conexao do MySQL.
+
+3) Cabecalho, corpo e estrutura base de pagina
+Para padronizar o visual e evitar repeticao, foram criados arquivos de layout com include:
+- includes/page_start.php (inicio da estrutura HTML: head, estilos globais e abertura do body)
+- includes/page_end.php (fechamento da pagina)
+- includes/forms/cad_vis_user_form.php (formulario separado)
+
+Com isso, o "cabecalho" e o "corpo" da pagina passaram a ficar mais organizados.
+Em vez de repetir HTML completo em cada tela, a pagina principal chama os blocos com include.
+
+4) Desenvolvimento com include e como isso facilitou
+Uso de include no projeto:
+- cad_vis_user.php inclui page_start.php + formulario + page_end.php
+- acessoNegado.php tambem reaproveita o layout base
+
+Vantagens praticas:
+- Menos codigo duplicado
+- Mudanca visual centralizada (altera em 1 arquivo e reflete em varias telas)
+- Melhor leitura para manutencao
+- Evolucao mais rapida do sistema
+
+5) Desenvolvimento das tags e estrutura HTML/CSS
+Foi trabalhado o uso de tags HTML para composicao das telas:
+- Estrutura: <html>, <head>, <body>, <main>, <section>, <header>, <nav>
+- Formularios: <form>, <label>, <input>, <button>, <a>
+- Conteudo visual: <div>, <h1>, <p>, <img>, <table>, <thead>, <tbody>, <tr>, <td>
+
+No CSS, foram aplicados:
+- Layout responsivo com media queries
+- Cards e botoes com estilos reutilizaveis
+- Fundo padronizado com imagem e gradiente
+- Melhor hierarquia visual (cabecalho, conteudo, acoes)
+
+6) Login, acesso negado e navegacao
+Fluxo de autenticacao implementado:
+- frontend.php: valida login
+- principal.php: pagina protegida por sessao
+- acessoNegado.php: mensagens de erro de acesso
+
+Depois, o controle de sessao foi melhorado com mais seguranca:
+- Criacao do arquivo includes/session.php para centralizar a sessao
+- session_regenerate_id(true) no login bem-sucedido
+- Timeout de sessao por inatividade
+- logout.php para encerrar sessao corretamente
+- Botoes "Sair" nas telas protegidas
+
+Melhorias de navegacao:
+- Botao "Voltar ao inicio" ajustado para index.php
+- Botao extra abaixo de "Entrar" no login, levando para index.php
+
+7) Cadastro com banco de dados (persistencia)
+Foi criado o processamento de cadastro em cadastroaction.php para salvar no MySQL.
+Regras implementadas:
+- Campos obrigatorios
+- Confirmacao de senha
+- Nome de usuario unico
+- Senha com no minimo 4 caracteres
+
+Depois do cadastro bem-sucedido, o usuario e redirecionado para login com mensagem de sucesso.
+
+8) Criptografia de senha (seguranca)
+Tipos/funcoes de criptografia de senha usadas:
+- password_hash(..., PASSWORD_DEFAULT): gera hash seguro da senha
+- password_verify(...): confere senha digitada com hash salvo
+
+Tambem foi mantida compatibilidade com usuarios antigos (senha em texto puro), com migracao automatica para hash no primeiro login valido.
+
+Importante no banco:
+A coluna senha da tabela visitante precisou ser alterada para VARCHAR(255), porque hash nao cabe em VARCHAR(45).
+
+9) Painel administrativo
+Foi criado painel_admin.php com:
+- Protecao por sessao
+- Listagem de cadastrados (ID e nome)
+- Busca por nome
+- Contador de resultados
+- Botao para voltar ao inicio (index.php)
+
+10) Pagina de apresentacao para visitante
+Foi criada visitante.php para quando o usuario clicar no botao Visitante na index.
+Caracteristicas:
+- Mais imagem da web e poucos cards
+- Texto de apresentacao com proposta de valor
+- Exemplo solicitado: "mais de 150 estabelecimentos" e "descontos de ate 30%" em categorias como academia, restaurante, cinema e dentista
+
+Em um momento do desenvolvimento, as imagens externas da pagina visitante deixaram de aparecer.
+Foi feita uma verificacao e o HTML estava correto, mas para evitar dependencia de carregamento externo, as imagens foram baixadas e salvas localmente na pasta img/visitante.
+Com isso, a pagina ficou mais estavel e deixou de depender da internet para mostrar esse conteudo visual.
+
+11) Ajustes de experiencia do usuario nos formularios
+Outro ajuste importante foi feito nas telas de cadastro e login.
+Os navegadores estavam preenchendo automaticamente os campos com dados antigos, o que atrapalhava quando o usuario queria inserir novos dados.
+
+Para resolver isso, foram aplicadas estas melhorias:
+- Mudanca dos nomes dos campos de cadastro para cadNome, cadSenha e cadConfirmarSenha
+- Mudanca dos nomes dos campos de login para loginNome e loginSenha
+- Uso de autocomplete="off" no formulario
+- Uso de autocomplete="new-password" nos campos de senha
+
+Esse ajuste melhorou bastante a experiencia do usuario, porque agora as telas abrem limpas para novos preenchimentos.
+
+12) Comandos e ferramentas usadas (exemplos)
+A) Ferramentas de analise de codigo e arquivos
+- list_dir: listar arquivos/pastas
+- file_search / grep_search: localizar arquivos e referencias
+- read_file: ler conteudo do arquivo
+- get_errors: checar erros no editor
+
+B) Ferramentas de edicao
+- apply_patch: editar e criar arquivos com seguranca e rastreabilidade
+- create_file / create_directory: criar arquivos e pastas estruturadas
+
+C) Terminal (validacao real)
+- php -l arquivo.php: validar sintaxe PHP
+- mysql.exe ...: testar conexao, checar schema e executar SQL
+- curl.exe ...: testar respostas HTTP, redirecionamentos e sessao
+- ping localhost: validar resolucao local
+- Invoke-WebRequest: baixar imagens da web para o projeto local
+
+13) Resultado final
+No final do desenvolvimento, o projeto ficou com:
+- Estrutura mais limpa
+- Fluxo de login/cadastro funcional
+- Persistencia no banco
+- Senhas protegidas por hash
+- Pagina administrativa de consulta
+- Pagina de apresentacao de visitante
+- Melhor navegacao entre telas
+- Logout funcionando com encerramento correto da sessao
+- Controle de sessao mais completo com tempo de expiracao
+- Formularios abrindo limpos para novos dados
+- Imagens da pagina visitante armazenadas localmente para mais estabilidade
+- Perfil admin real implementado com permissao no banco (coluna perfil)
+- Painel admin restrito para usuario com perfil admin
+- Pagina de edicao de usuario criada (admin_usuario_editar.php)
+- Endpoint de exclusao de usuario criado (admin_usuario_excluir.php)
+- Navegacao padronizada em barra reutilizavel (includes/top_nav.php)
+
+14) Conclusao (visao de aluno de 2o semestre)
+Esse projeto ajudou muito a entender pratica de desenvolvimento web com PHP + MySQL. O principal aprendizado foi organizar o codigo em partes menores com include, validar entradas do usuario e aplicar seguranca basica de autenticacao. Tambem ficou claro que testar no terminal e no navegador durante cada alteracao reduz erro e acelera a entrega.
+
+Outro aprendizado importante foi perceber que nem sempre o erro esta no PHP. Em alguns casos, como imagens externas e preenchimento automatico do navegador, o problema estava no comportamento do ambiente e do browser. Isso mostrou como o desenvolvimento web exige atencao tanto ao backend quanto ao frontend.
+
+Sugestao de evolucao futura:
+- Criar perfil admin real (com permissao)
+- Padronizar todas as telas na mesma base de layout
+- Adicionar pagina de edicao/exclusao no painel admin
