@@ -6,6 +6,5 @@ RUN a2enmod rewrite
 WORKDIR /var/www/html
 COPY . /var/www/html
 
-RUN chmod +x /var/www/html/render/start.sh
-
-CMD ["/var/www/html/render/start.sh"]
+# DESTAQUE: Railway/Render definem a porta via env PORT; ajustamos Apache em runtime.
+CMD ["sh", "-c", "PORT=${PORT:-8080}; sed -ri \"s/^Listen .*/Listen ${PORT}/\" /etc/apache2/ports.conf; sed -ri \"s#<VirtualHost \\*:.*>#<VirtualHost *:${PORT}>#\" /etc/apache2/sites-available/000-default.conf; apache2-foreground"]
